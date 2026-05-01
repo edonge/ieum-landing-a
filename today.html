@@ -605,6 +605,15 @@
     return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
   }
 
+  function codeOffset(code) {
+    // 가족 코드를 정수로 해싱 → 질문 시작 위치
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < code.length; i++) {
+      h = Math.imul(h ^ code.charCodeAt(i), 16777619) >>> 0;
+    }
+    return h % QUESTIONS.length;
+  }
+
   function relativeTime(ts) {
     const diff = (Date.now() - new Date(ts).getTime()) / 1000;
     if (diff < 60) return "방금";
@@ -719,7 +728,9 @@
     showScreen("screen-today");
     const day = dayIndex();
     currentDay = day;
-    const q = QUESTIONS[((day % QUESTIONS.length) + QUESTIONS.length) % QUESTIONS.length];
+    const offset = codeOffset(STORE.code);
+    const idx = (((day + offset) % QUESTIONS.length) + QUESTIONS.length) % QUESTIONS.length;
+    const q = QUESTIONS[idx];
 
     document.getElementById("qTag").textContent = q.tag;
     document.getElementById("qText").textContent = q.body;
