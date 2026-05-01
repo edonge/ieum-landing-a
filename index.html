@@ -590,16 +590,25 @@
     color: var(--ink-muted);
     line-height: 1.6;
   }
-  .form-card .success {
-    display: none;
-    font-family: "Noto Serif KR", serif;
-    font-size: 16px;
-    color: var(--ink);
-    padding: 8px 0;
-    line-height: 1.6;
+  .cta-button {
+    display: block;
+    width: 100%;
+    padding: 16px 22px;
+    background: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    text-decoration: none;
+    text-align: center;
+    transition: opacity 0.2s ease;
+    margin-top: 8px;
   }
-  .form-card.sent form { display: none; }
-  .form-card.sent .success { display: block; }
+  .cta-button:hover { opacity: 0.88; }
+  .cta-button:active { opacity: 0.78; }
 
   footer {
     border-top: 1px solid var(--line);
@@ -957,29 +966,22 @@
     <!-- CLOSE -->
     <section class="close" id="close">
       <div class="wrap-narrow">
-        <div class="label-mono reveal" style="margin-bottom: 32px;">§ — 사전신청</div>
+        <div class="label-mono reveal" style="margin-bottom: 32px;">§ — 지금 써보기</div>
         <h2 class="display-l reveal d1">
           오늘 도착한 질문에,<br />
           당신은 어떻게 답할까요.
         </h2>
         <p class="lede reveal d2">
-          이음은 지금 작은 가족들과 함께 첫 질문을 만들고 있습니다.
-          첫 메일이 준비되면, 가장 먼저 알려드릴게요.
+          이음은 지금 작은 가족들과 함께 검증되고 있습니다.
+          가입 없이, 가족 코드와 이름만으로 시작할 수 있어요.
         </p>
 
         <div class="form-card reveal d3">
-          <span class="label-mono">Early access · 사전신청</span>
-          <form id="signup">
-            <input type="email" placeholder="이메일 주소" required />
-            <button type="submit">신청</button>
-          </form>
-          <p class="success">
-            신청해주셔서 감사합니다.<br />
-            첫 질문이 준비되면 가장 먼저 메일로 알려드릴게요.
-          </p>
+          <span class="label-mono">Try · 프리토타입 v0.1</span>
+          <a href="today.html" class="cta-button">오늘의 질문 보러 가기 →</a>
           <p class="note">
-            검증 단계의 서비스입니다. 받은 메일 주소는 출시 안내 외에
-            다른 용도로 쓰지 않습니다.
+            먼저 시작한 가족이 있다면 코드를 입력하고, 아니면 새로 만들어 가족과 공유해주세요.
+            같은 코드를 쓰는 가족끼리 매일의 답을 함께 봅니다.
           </p>
         </div>
       </div>
@@ -1006,15 +1008,6 @@
       { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
     );
     document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
-
-    const form = document.getElementById("signup");
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const card = form.closest(".form-card");
-        if (card) card.classList.add("sent");
-      });
-    }
   </script>
 </body>
 </html>

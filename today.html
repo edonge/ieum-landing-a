@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<title>이음 — 오늘의 질문</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+/>
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --bg-soft: #efece4;
+    --paper: #fbfaf6;
+    --ink: #1a1814;
+    --ink-soft: #5a564e;
+    --ink-muted: #8a8579;
+    --line: rgba(26, 24, 20, 0.1);
+    --line-strong: rgba(26, 24, 20, 0.18);
+    --error: #b94d2f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100%; }
+  body {
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    overflow-x: hidden;
+  }
+
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  .screen {
+    padding: 28px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .screen[hidden] { display: none; }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+  }
+  .brand-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: "Noto Serif KR", serif;
+    font-size: 15px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .brand-mark {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--ink);
+    position: relative;
+  }
+  .brand-mark::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .meta-btn {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 4px;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .meta-btn:active { background: var(--bg-soft); }
+
+  .meta-strip {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 12px 0 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .meta-strip p {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .meta-strip code {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--ink);
+    letter-spacing: 0.06em;
+    font-size: 13px;
+  }
+  .meta-strip .text-btn {
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    color: var(--ink-muted);
+    font-size: 12px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    padding: 4px 0 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  /* SETUP screens */
+  .setup {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 0;
+  }
+  .setup-eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+  }
+  .setup-title {
+    font-family: "Noto Serif KR", serif;
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1.32;
+    letter-spacing: -0.024em;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .setup-title.code-display {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 44px;
+    letter-spacing: 0.18em;
+    margin: 8px 0 24px;
+  }
+  .setup-desc {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .big-input {
+    width: 100%;
+    padding: 16px 18px;
+    font-family: inherit;
+    font-size: 17px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+    -webkit-appearance: none;
+  }
+  .big-input.code-input {
+    font-family: "JetBrains Mono", monospace;
+    text-align: center;
+    letter-spacing: 0.16em;
+    font-size: 22px;
+  }
+  .big-input:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    padding: 16px 22px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: -0.005em;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s ease, background 0.2s ease;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--bg);
+    border: 1px solid var(--ink);
+  }
+  .btn-primary:active { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.4; cursor: default; }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    font-weight: 400;
+  }
+  .btn-secondary:active { background: var(--bg-soft); }
+  .btn-primary + .btn-secondary,
+  .btn-secondary + .btn-primary { margin-top: 8px; }
+
+  .divider {
+    text-align: center;
+    margin: 18px 0;
+    position: relative;
+  }
+  .divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--line);
+  }
+  .divider span {
+    background: var(--bg);
+    padding: 0 12px;
+    position: relative;
+    font-size: 12px;
+    color: var(--ink-muted);
+    letter-spacing: 0.06em;
+  }
+
+  /* TODAY screen */
+  .question {
+    padding: 36px 0 36px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 28px;
+  }
+  .q-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 18px;
+  }
+  .q-text {
+    font-family: "Noto Serif KR", serif;
+    font-weight: 400;
+    font-size: clamp(26px, 7vw, 32px);
+    line-height: 1.4;
+    letter-spacing: -0.022em;
+    color: var(--ink);
+  }
+
+  .answers {
+    margin-bottom: 24px;
+  }
+  .answers-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+  }
+  .answer {
+    padding: 18px 0 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .answer-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .answer-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .answer-time {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+  }
+  .answer-body {
+    font-family: "Noto Serif KR", serif;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink);
+    letter-spacing: -0.014em;
+    white-space: pre-wrap;
+  }
+  .answer.is-mine .answer-name::after {
+    content: "· 나";
+    color: var(--ink-muted);
+    margin-left: 6px;
+    font-weight: 400;
+  }
+  .answers-empty {
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.7;
+    padding: 12px 0 4px;
+  }
+
+  .my-answer {
+    margin-top: auto;
+    padding-top: 20px;
+  }
+  .my-answer textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 16px;
+    font-family: "Noto Serif KR", serif;
+    font-size: 17px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    resize: vertical;
+    line-height: 1.6;
+    letter-spacing: -0.014em;
+    margin-bottom: 12px;
+    -webkit-appearance: none;
+  }
+  .my-answer textarea:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+
+  .answered-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 22px 22px;
+    margin-top: 4px;
+  }
+  .answered-card .label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+  }
+  .answered-card p {
+    font-family: "Noto Serif KR", serif;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+    max-width: calc(100vw - 48px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .toast.show { opacity: 1; }
+
+  .error-msg {
+    color: var(--error);
+    font-size: 13px;
+    margin-top: 8px;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  ::selection { background: var(--ink); color: var(--bg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+<main class="app" id="app">
+
+  <!-- SCREEN: ENTER FAMILY CODE -->
+  <section class="screen" id="screen-code">
+    <div class="header">
+      <a href="index.html" class="brand-mini">
+        <span class="brand-mark"></span>
+        <span>이음</span>
+      </a>
+    </div>
+    <div class="setup">
+      <p class="setup-eyebrow">시작 · 1 / 2</p>
+      <h2 class="setup-title">우리 가족<br />코드가 있나요?</h2>
+      <p class="setup-desc">먼저 시작한 가족이 있다면, 그 코드를 입력해주세요. 없다면 새로 만들 수 있어요.</p>
+      <input
+        type="text"
+        class="big-input code-input"
+        placeholder="ABCDEF"
+        id="codeInput"
+        autocapitalize="characters"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        maxlength="6"
+        inputmode="text"
+      />
+      <button class="btn-primary" id="codeJoinBtn">참여하기</button>
+      <div class="divider"><span>또는</span></div>
+      <button class="btn-secondary" id="codeCreateBtn">새 가족 코드 만들기</button>
+      <p class="error-msg" id="codeError" hidden></p>
+    </div>
+  </section>
+
+  <!-- SCREEN: CREATED -->
+  <section class="screen" id="screen-created" hidden>
+    <div class="header">
+      <a href="index.html" class="brand-mini">
+        <span class="brand-mark"></span>
+        <span>이음</span>
+      </a>
+    </div>
+    <div class="setup">
+      <p class="setup-eyebrow">코드가 만들어졌어요</p>
+      <h2 class="setup-title code-display" id="createdCode">XXXXXX</h2>
+      <p class="setup-desc">이 코드를 가족에게 알려주세요. 같은 코드를 입력한 가족끼리 매일의 답을 함께 봅니다.</p>
+      <button class="btn-primary" id="copyCodeBtn">코드 복사하기</button>
+      <button class="btn-secondary" id="continueBtn">이어서 시작하기</button>
+    </div>
+  </section>
+
+  <!-- SCREEN: NAME -->
+  <section class="screen" id="screen-name" hidden>
+    <div class="header">
+      <a href="index.html" class="brand-mini">
+        <span class="brand-mark"></span>
+        <span>이음</span>
+      </a>
+    </div>
+    <div class="setup">
+      <p class="setup-eyebrow">시작 · 2 / 2</p>
+      <h2 class="setup-title">이 가족 안에서,<br />나는 어떻게 불려?</h2>
+      <p class="setup-desc">가족이 알아볼 이름이면 됩니다. (예: 엄마, 아빠, 동현, 막내)</p>
+      <input
+        type="text"
+        class="big-input"
+        placeholder="이름"
+        id="nameInput"
+        maxlength="12"
+        autocomplete="off"
+      />
+      <button class="btn-primary" id="nameSaveBtn">시작하기</button>
+    </div>
+  </section>
+
+  <!-- SCREEN: TODAY -->
+  <section class="screen" id="screen-today" hidden>
+    <div class="header">
+      <a href="index.html" class="brand-mini">
+        <span class="brand-mark"></span>
+        <span>이음</span>
+      </a>
+      <button class="meta-btn" id="metaBtn" aria-label="메뉴">⋯</button>
+    </div>
+
+    <div class="meta-strip" id="metaStrip" hidden>
+      <p>가족 코드 · <code id="metaCode"></code></p>
+      <p>나 · <span id="metaName"></span></p>
+      <button class="text-btn" id="resetBtn">다른 가족으로 들어가기 (코드 재설정)</button>
+    </div>
+
+    <section class="question">
+      <p class="q-label">Q · <span id="qTag"></span></p>
+      <h1 class="q-text" id="qText"></h1>
+    </section>
+
+    <section class="answers">
+      <p class="answers-label">우리 가족의 답</p>
+      <div id="answersList"></div>
+    </section>
+
+    <section class="my-answer" id="myAnswer"></section>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const SUPABASE_URL = "https://otkeuveeyeufbibwjxbj.supabase.co";
+  const SUPABASE_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90a2V1dmVleWV1ZmJpYndqeGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MjQxOTAsImV4cCI6MjA5MzIwMDE5MH0.uMBDjqUFMrukOQf6GzUC0l18Nx1exT06Nk4d34PRxbI";
+  const supa = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ---- 30 questions, all family-neutral ----
+  const RAW = {
+    DAILY: [
+      "오늘 가장 자주 떠올린 사람은 누구야?",
+      "오늘 하루 중 가장 기뻤던 순간은?",
+      "요즘 가장 자주 듣는 노래가 뭐야?",
+      "오늘 가장 맛있게 먹은 한 끼는?",
+      "요즘 가장 자주 가는 장소는 어디야?",
+      "오늘 무엇 때문에 잠깐 멈춰 섰어?",
+    ],
+    RETRO: [
+      "어릴 때 가장 좋아했던 노래는 뭐였어?",
+      "어릴 때 가장 무서워했던 건 뭐였어?",
+      "처음으로 좋아한 사람은 어떤 사람이었어?",
+      "다시 살 수 있다면, 몇 살로 돌아가고 싶어?",
+      "학창시절 가장 친했던 친구를 떠올리면?",
+      "어릴 때 꿈은 뭐였어?",
+      "처음 받은 용돈으로 뭘 샀는지 기억나?",
+      "부모님이 해주신 음식 중 가장 그리운 건?",
+    ],
+    DEEP: [
+      "요즘 마음 쓰고 있는 일이 있어?",
+      "잠들기 직전, 어떤 생각이 가장 자주 떠올라?",
+      "최근에 누군가에게 미안했던 순간은?",
+      "한 번도 누구에게 말 안 한 비밀 한 가지가 있다면?",
+      "살면서 가장 후회되는 선택을 꼽는다면?",
+      "살면서 가장 행복했던 한 순간을 꼽는다면?",
+      "지금 가장 두려운 게 뭐야?",
+      "다시 한번 만나고 싶은 사람이 있어?",
+    ],
+    FAMILY: [
+      "우리 가족을 한 단어로 표현한다면?",
+      "가족 중에서 가장 닮고 싶은 사람은 누구야? 왜?",
+      "가족과 함께한 가장 행복한 순간을 꼽는다면?",
+      "가족에게 한 번도 말 못했던 한 마디가 있다면?",
+      "우리 집 하면 떠오르는 냄새는 뭐야?",
+      "가족이 모르는 내 모습이 있다면?",
+      "우리 가족에게 가장 고마웠던 순간은?",
+      "가족이 사라진다고 상상하면, 가장 그리울 것 같은 한 가지는?",
+    ],
+  };
+
+  // round-robin order so categories are interleaved across days
+  const QUESTIONS = (() => {
+    const order = ["DAILY", "RETRO", "DEEP", "FAMILY"];
+    const max = Math.max(...order.map((t) => RAW[t].length));
+    const out = [];
+    for (let i = 0; i < max; i++) {
+      for (const tag of order) {
+        if (RAW[tag][i]) out.push({ tag, body: RAW[tag][i] });
+      }
+    }
+    return out;
+  })();
+
+  const STORE = {
+    get code() { return localStorage.getItem("ieum:familyCode") || ""; },
+    set code(v) { localStorage.setItem("ieum:familyCode", v); },
+    get name() { return localStorage.getItem("ieum:name") || ""; },
+    set name(v) { localStorage.setItem("ieum:name", v); },
+    reset() {
+      localStorage.removeItem("ieum:familyCode");
+      localStorage.removeItem("ieum:name");
+    },
+  };
+
+  // ---- KST-anchored day index ----
+  function dayIndex() {
+    const KST_MS = 9 * 3600 * 1000;
+    const k = new Date(Date.now() + KST_MS);
+    const today = Date.UTC(k.getUTCFullYear(), k.getUTCMonth(), k.getUTCDate());
+    const anchor = Date.UTC(2026, 0, 1); // 2026-01-01 KST
+    return Math.max(0, Math.floor((today - anchor) / 86400000));
+  }
+
+  function genCode() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  }
+
+  function relativeTime(ts) {
+    const diff = (Date.now() - new Date(ts).getTime()) / 1000;
+    if (diff < 60) return "방금";
+    if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+    const d = new Date(ts);
+    const KST = new Date(d.getTime() + (9 * 60 - d.getTimezoneOffset()) * 60000);
+    return `${KST.getUTCMonth() + 1}월 ${KST.getUTCDate()}일`;
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach((el) => (el.hidden = true));
+    document.getElementById(id).hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  function showErr(elId, msg) {
+    const el = document.getElementById(elId);
+    if (msg) {
+      el.textContent = msg;
+      el.hidden = false;
+    } else {
+      el.hidden = true;
+    }
+  }
+
+  // ==== Code screen ====
+  document.getElementById("codeInput").addEventListener("input", (e) => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  });
+
+  document.getElementById("codeJoinBtn").addEventListener("click", () => {
+    const v = document.getElementById("codeInput").value.trim().toUpperCase();
+    if (!/^[A-Z0-9]{6}$/.test(v)) {
+      return showErr("codeError", "코드는 영문/숫자 6자리예요.");
+    }
+    showErr("codeError", null);
+    STORE.code = v;
+    showScreen("screen-name");
+  });
+
+  document.getElementById("codeCreateBtn").addEventListener("click", () => {
+    const c = genCode();
+    STORE.code = c;
+    document.getElementById("createdCode").textContent = c;
+    showScreen("screen-created");
+  });
+
+  // ==== Created screen ====
+  document.getElementById("copyCodeBtn").addEventListener("click", async () => {
+    const code = STORE.code;
+    try {
+      await navigator.clipboard.writeText(code);
+      toast(`${code} 복사됨`);
+    } catch (e) {
+      toast(`코드: ${code}`);
+    }
+  });
+
+  document.getElementById("continueBtn").addEventListener("click", () => {
+    showScreen("screen-name");
+  });
+
+  // ==== Name screen ====
+  document.getElementById("nameSaveBtn").addEventListener("click", () => {
+    const v = document.getElementById("nameInput").value.trim();
+    if (!v) {
+      document.getElementById("nameInput").focus();
+      return;
+    }
+    STORE.name = v;
+    renderToday();
+  });
+
+  document.getElementById("nameInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("nameSaveBtn").click();
+  });
+
+  // ==== Today screen ====
+  document.getElementById("metaBtn").addEventListener("click", () => {
+    const s = document.getElementById("metaStrip");
+    s.hidden = !s.hidden;
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    if (confirm("가족 코드와 이름을 초기화할까요?\n(이미 남긴 답은 그대로 남습니다)")) {
+      STORE.reset();
+      location.reload();
+    }
+  });
+
+  let currentDay = null;
+
+  async function renderToday() {
+    showScreen("screen-today");
+    const day = dayIndex();
+    currentDay = day;
+    const q = QUESTIONS[((day % QUESTIONS.length) + QUESTIONS.length) % QUESTIONS.length];
+
+    document.getElementById("qTag").textContent = q.tag;
+    document.getElementById("qText").textContent = q.body;
+    document.getElementById("metaCode").textContent = STORE.code;
+    document.getElementById("metaName").textContent = STORE.name;
+
+    await loadAnswers(day);
+  }
+
+  async function loadAnswers(day) {
+    const list = document.getElementById("answersList");
+    const myEl = document.getElementById("myAnswer");
+
+    const { data, error } = await supa
+      .from("answers")
+      .select("*")
+      .eq("family_code", STORE.code)
+      .eq("day_index", day)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error(error);
+      list.innerHTML = `<p class="answers-empty">불러오기에 실패했어요. 잠시 후 다시 시도해주세요.</p>`;
+      myEl.innerHTML = "";
+      return;
+    }
+
+    const answers = data || [];
+    const mine = answers.find((a) => a.name === STORE.name);
+
+    if (answers.length === 0) {
+      list.innerHTML = `<p class="answers-empty">아직 가족 누구도 답하지 않았어요.<br />가장 먼저 한 줄을 남겨보세요.</p>`;
+    } else {
+      list.innerHTML = answers
+        .map(
+          (a) => `
+        <div class="answer ${a.name === STORE.name ? "is-mine" : ""}">
+          <div class="answer-meta">
+            <span class="answer-name">${escapeHtml(a.name)}</span>
+            <span class="answer-time">${relativeTime(a.created_at)}</span>
+          </div>
+          <p class="answer-body">${escapeHtml(a.body)}</p>
+        </div>
+      `
+        )
+        .join("");
+    }
+
+    if (mine) {
+      myEl.innerHTML = `
+        <div class="answered-card">
+          <p class="label">오늘 답을 남겼어요</p>
+          <p>내일 새 질문이 도착할 때 다시 만나요.</p>
+        </div>
+      `;
+    } else {
+      myEl.innerHTML = `
+        <p class="answers-label">내 답</p>
+        <textarea id="myInput" placeholder="짧게라도 한 줄. 가족이 함께 봐요."></textarea>
+        <button class="btn-primary" id="submitBtn">답 남기기</button>
+        <p class="error-msg" id="submitError" hidden></p>
+      `;
+      document.getElementById("submitBtn").addEventListener("click", () => submitAnswer(day));
+    }
+  }
+
+  async function submitAnswer(day) {
+    const ta = document.getElementById("myInput");
+    const body = ta.value.trim();
+    if (!body) {
+      ta.focus();
+      return;
+    }
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.textContent = "남기는 중…";
+
+    const { error } = await supa.from("answers").insert({
+      family_code: STORE.code,
+      name: STORE.name,
+      day_index: day,
+      body,
+    });
+
+    if (error) {
+      console.error(error);
+      btn.disabled = false;
+      btn.textContent = "답 남기기";
+      showErr("submitError", "저장에 실패했어요. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
+    toast("답이 남았어요");
+    await loadAnswers(day);
+  }
+
+  // refresh on tab refocus
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && currentDay !== null) loadAnswers(currentDay);
+  });
+
+  // ==== Init ====
+  function init() {
+    if (!STORE.code) return showScreen("screen-code");
+    if (!STORE.name) return showScreen("screen-name");
+    return renderToday();
+  }
+  init();
+</script>
+</body>
+</html>
